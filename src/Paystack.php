@@ -817,7 +817,7 @@ class Paystack
         )->getResponse();
     }
 
-    public function createTransferRecipient(?array $data = null): void
+    public function createTransferRecipient(?array $data = null): Paystack
     {
         if ($data === null) {
             $data = [
@@ -838,6 +838,7 @@ class Paystack
         }
 
         $this->setHttpResponse(self::TRANSFER_RECIPIENT_ENDPOINT, "POST", $data);
+        return $this;
     }
 
     /**
