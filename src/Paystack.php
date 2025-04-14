@@ -33,6 +33,8 @@ class Paystack
      */
     const TRANSFER_ENDPOINT = "/transfer";
 
+    const TRANSFER_RECIPIENT_ENDPOINT = "/transferrecipient";
+
     /**
      * Issue Secret Key from your Paystack Dashboard
      * @var string
@@ -835,7 +837,7 @@ class Paystack
             }
         }
 
-        $this->setHttpResponse(self::TRANSFER_RECIPIENT_ENPOINT, "POST", $data);
+        $this->setHttpResponse(self::TRANSFER_RECIPIENT_ENDPOINT, "POST", $data);
     }
 
     /**
