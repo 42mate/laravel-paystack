@@ -12,6 +12,7 @@
 namespace Unicodeveloper\Paystack;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Unicodeveloper\Paystack\Exceptions\IsNullException;
 use Unicodeveloper\Paystack\Exceptions\PaymentVerificationFailedException;
@@ -351,7 +352,7 @@ class Paystack
      * Get the whole response from a get operation
      * @return array
      */
-    private function getResponse()
+    public function getResponse()
     {
         return json_decode($this->response->getBody(), true);
     }
@@ -360,7 +361,7 @@ class Paystack
      * Get the data response from a get operation
      * @return array
      */
-    private function getData()
+    public function getData()
     {
         return $this->getResponse()["data"];
     }
@@ -839,6 +840,12 @@ class Paystack
 
         $this->setHttpResponse(self::TRANSFER_RECIPIENT_ENDPOINT, "POST", $data);
         return $this;
+    }
+
+    public function getTransferRecipients()
+    {
+        $this->setHttpResponse(self::TRANSFER_RECIPIENT_ENDPOINT, 'GET');
+        return $this->getData();
     }
 
     /**
