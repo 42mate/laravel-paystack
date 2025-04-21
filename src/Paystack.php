@@ -180,7 +180,7 @@ class Paystack
      * @param string $relativeUrl
      * @param string $method
      * @param array $body
-     * @return Paystacknn
+     * @return Paystack
      * @throws IsNullException
      */
     private function setHttpResponse(
@@ -910,7 +910,7 @@ class Paystack
     public function verifyTransfer(string $reference): array
     {
         return $this
-            ->setHttpResponse(Endpoints::TRANSFER . '/finalize_transfer/' . $reference, 'GET')
+            ->setHttpResponse(Endpoints::TRANSFER_FINALIZE . '/' . $reference, 'GET')
             ->getResponse();
     }
 

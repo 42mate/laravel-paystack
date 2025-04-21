@@ -5,6 +5,7 @@ namespace Unicodeveloper\Paystack;
 class Endpoints {
     public const TRANSFER = '/transfer';
     public const TRANSFER_RECIPIENT = '/transferrecipient';
+    public const TRANSFER_FINALIZE = '/transfer/finalize_transfer';
     public const TRANSACTION = '/transaction';
     public const TRANSACTION_INITIALIZE = '/transaction/initialize';
     public const TRANSACTION_VERIFY = '/transaction/verify';
