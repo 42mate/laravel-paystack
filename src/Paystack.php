@@ -810,6 +810,26 @@ class Paystack
         )->getResponse();
     }
 
+    /**
+     * Create a transfer recipient.
+     *
+     * If no data is provided, it uses the current request to populate the fields.
+     *
+     * Required fields:
+     * - type
+     * - name
+     * - account_number
+     * - bank_code
+     *
+     * Optional fields:
+     * - description
+     * - currency
+     * - authorization_code
+     * - metadata
+     *
+     * @param array|null $data Optional data to create the transfer recipient.
+     * @return array The API response.
+     */
     public function createTransferRecipient(?array $data = null): array
     {
         if ($data === null) {
@@ -820,10 +840,7 @@ class Paystack
                 "bank_code" => request()->bank_code,
             ];
 
-            foreach (
-                ["description", "currency", "authorization_code", "metadata"]
-                as $optional
-            ) {
+            foreach (["description", "currency", "authorization_code", "metadata"] as $optional) {
                 if (request()->has($optional)) {
                     $data[$optional] = request()->$optional;
                 }
@@ -835,12 +852,22 @@ class Paystack
             ->getResponse();
     }
 
+    /**
+     * Retrieve all transfer recipients.
+     *
+     * @return array The API response containing transfer recipients.
+     */
     public function getTransferRecipients(): array
     {
         $this->setHttpResponse(Endpoints::TRANSFER_RECIPIENT, 'GET');
         return $this->getResponse();
     }
 
+    /**
+     * Retrieve details of a transfer.
+     *
+     * @return array The API response containing transfer details.
+     */
     public function retrieveTransfer(): array
     {
         return $this
@@ -848,6 +875,18 @@ class Paystack
             ->getResponse();
     }
 
+    /**
+     * Finalize a transfer that requires OTP validation.
+     *
+     * If no data is provided, it uses the current request to populate the fields.
+     *
+     * Required fields:
+     * - transfer_code
+     * - otp
+     *
+     * @param array|null $data Optional data to finalize the transfer.
+     * @return array The API response.
+     */
     public function finalizeTransfer(?array $data = null): array
     {
         if (is_null($data)) {
@@ -862,7 +901,12 @@ class Paystack
             ->getResponse();
     }
 
-
+    /**
+     * Verify the status of a transfer by its reference.
+     *
+     * @param string $reference The transfer reference to verify.
+     * @return array The API response.
+     */
     public function verifyTransfer(string $reference): array
     {
         return $this
@@ -871,13 +915,26 @@ class Paystack
     }
 
     /**
-     *  "source": "balance",
-
-     "reason": "Calm down",
-
-     "amount":3794800,
-
-     "recipient": "RCP_gx2wn530m0i3w3m"
+     * Initiate a new transfer.
+     *
+     * If no data is provided, it uses the current request to populate the fields.
+     *
+     * Required fields:
+     * - source (e.g., "balance")
+     * - reason
+     * - amount
+     * - recipient
+     *
+     * Example payload:
+     * {
+     *   "source": "balance",
+     *   "reason": "Calm down",
+     *   "amount": 3794800,
+     *   "recipient": "RCP_gx2wn530m0i3w3m"
+     * }
+     *
+     * @param array|null $data Optional data to initiate the transfer.
+     * @return array The API response.
      */
     public function makeTransfer(?array $data = null): array
     {
