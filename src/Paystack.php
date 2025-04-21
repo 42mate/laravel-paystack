@@ -244,9 +244,9 @@ class Paystack
      * True or false condition whether the transaction is verified
      * @return boolean
      */
-    public function isTransactionVerificationValid($transaction_id = null)
+    public function isTransactionVerificationValid($transactionId = null)
     {
-        $this->verifyTransactionAtGateway($transaction_id);
+        $this->verifyTransactionAtGateway($transactionId);
 
         $result = $this->getResponse()["message"];
 
@@ -385,11 +385,11 @@ class Paystack
      * @param $plan_code
      * @return array
      */
-    public function fetchPlan($plan_code)
+    public function fetchPlan($planCode)
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::PLAN . "/" . $plan_code,
+            Endpoints::PLAN . "/" . $planCode,
             "GET",
             []
         )->getResponse();
@@ -452,11 +452,11 @@ class Paystack
      * @param $customer_id
      * @return array
      */
-    public function fetchCustomer($customer_id)
+    public function fetchCustomer($customerId)
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::CUSTOMER . "/" . $customer_id,
+            Endpoints::CUSTOMER . "/" . $customerId,
             "GET",
             []
         )->getResponse();
@@ -545,12 +545,12 @@ class Paystack
      * @param integer $customer_id
      * @return array
      */
-    public function getCustomerSubscriptions($customer_id)
+    public function getCustomerSubscriptions($customerId)
     {
         $this->setRequestOptions();
 
         return $this->setHttpResponse(
-            Endpoints::SUBSCRIPTION . "?customer=" . $customer_id,
+            Endpoints::SUBSCRIPTION . "?customer=" . $customerId,
             "GET",
             []
         )->getData();
@@ -562,12 +562,12 @@ class Paystack
      * @param  integer $plan_id
      * @return array
      */
-    public function getPlanSubscriptions($plan_id)
+    public function getPlanSubscriptions($planId)
     {
         $this->setRequestOptions();
 
         return $this->setHttpResponse(
-            Endpoints::SUBSCRIPTION . "?plan=" . $plan_id,
+            Endpoints::SUBSCRIPTION . "?plan=" . $planId,
             "GET",
             []
         )->getData();
@@ -617,14 +617,14 @@ class Paystack
 
     /**
      * Fetch details about a certain subscription
-     * @param mixed $subscription_id
+     * @param mixed $subscriptionId
      * @return array
      */
-    public function fetchSubscription($subscription_id)
+    public function fetchSubscription($subscriptionId)
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::SUBSCRIPTION . "/" . $subscription_id,
+            Endpoints::SUBSCRIPTION . "/" . $subscriptionId,
             "GET",
             []
         )->getResponse();
@@ -662,11 +662,11 @@ class Paystack
      * @param mixed $page_id
      * @return array
      */
-    public function fetchPage($page_id)
+    public function fetchPage($pageId)
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::PAGE . '/' . $page_id,
+            Endpoints::PAGE . '/' . $pageId,
             "GET",
             []
         )->getResponse();
@@ -677,7 +677,7 @@ class Paystack
      * @param $page_id
      * @return array
      */
-    public function updatePage(mixed $page_id, ?array $data = null): array
+    public function updatePage(mixed $pageId, ?array $data = null): array
     {
         if (is_null($array)) {
             $data = [
@@ -689,7 +689,7 @@ class Paystack
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::PAGE . '/' . $page_id,
+            Endpoints::PAGE . '/' . $pageId,
             "PUT",
             $data
         )->getResponse();
@@ -729,11 +729,11 @@ class Paystack
      * @param subaccount code
      * @return array
      */
-    public function fetchSubAccount($subaccount_code): array
+    public function fetchSubAccount($subaccountCode): array
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::SUBACCOUNT . '/' . $subaccount_code,
+            Endpoints::SUBACCOUNT . '/' . $subaccountCode,
             "GET",
             []
         )->getResponse();
@@ -744,11 +744,11 @@ class Paystack
      * @param $per_page - Specifies how many records to retrieve per page , $page - SPecifies exactly what page to retrieve
      * @return array
      */
-    public function listSubAccounts($per_page, $page): array
+    public function listSubAccounts($perPage, $page): array
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::SUBACCOUNT . '/?perPage=' . (int) $per_page . "&page=" . (int) $page,
+            Endpoints::SUBACCOUNT . '/?perPage=' . (int) $perPage . "&page=" . (int) $page,
             "GET"
         )->getResponse();
     }
@@ -758,7 +758,7 @@ class Paystack
      * @param subaccount code
      * @return array
      */
-    public function updateSubAccount(array $subaccount_code, ?array $data = null): array
+    public function updateSubAccount(array $subaccountCode, ?array $data = null): array
     {
         if (is_null($data)) {
             $data = [
@@ -777,7 +777,7 @@ class Paystack
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::SUBACCOUNT ."/{$subaccount_code}",
+            Endpoints::SUBACCOUNT ."/{$subaccountCode}",
             "PUT",
             array_filter($data)
         )->getResponse();
@@ -815,14 +815,14 @@ class Paystack
      * @param $account_number - Account Number, $bank_code - You can get the list of bank codes by calling the List Banks endpoint
      * @return array
      */
-    public function confirmAccount(string $account_number, string $bank_code)
+    public function confirmAccount(string $accountNumber, string $bankCode)
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
             Endpoints::BANK . "/resolve/?account_number=" .
-                $account_number .
+                $accountNumber .
                 "&bank_code=" .
-                $bank_code,
+                $bankCode,
             "GET"
         )->getResponse();
     }
