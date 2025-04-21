@@ -851,6 +851,22 @@ class Paystack
     }
 
     /**
+     * Retrieve details of a transfer recipient.
+     *
+     * This method sends a GET request to fetch information about a specific 
+     * transfer recipient using their recipient code.
+     *
+     * @param string $recipientCode The unique code identifying the transfer recipient.
+     *
+     * @return array The response data containing the recipient's details.
+     */
+    public function retrieveTransferRecipient(string $recipientCode): array
+    {
+        $this->setHttpResponse(Endpoints::TRANSFER_RECIPIENT . '/' . $recipientCode, 'GET');
+        return $this->getResponse();
+    }
+
+    /**
      * Retrieve all transfer recipients.
      *
      * @return array The API response containing transfer recipients.
