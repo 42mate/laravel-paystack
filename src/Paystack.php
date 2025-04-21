@@ -180,7 +180,7 @@ class Paystack
      * @param string $relativeUrl
      * @param string $method
      * @param array $body
-     * @return Paystack
+     * @return Paystackxs
      * @throws IsNullException
      */
     private function setHttpResponse(
@@ -436,7 +436,7 @@ class Paystack
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::CUSTOMER
+            Endpoints::CUSTOMER,
             "POST",
             $data
         )->getResponse();
@@ -528,8 +528,6 @@ class Paystack
     public function getAllSubscriptions()
     {
         $this->setRequestOptions();
-        $this->
-
         return $this->setHttpResponse("/subscription", "GET", [])->getData();
     }
 
@@ -577,7 +575,7 @@ class Paystack
             "code" => request()->code,
             "token" => request()->token,
         ];
-        
+
         $this->setRequestOptions();
         return $this->setHttpResponse(
             Endpoints::SUBSCRIPTION_ENABLE,
@@ -585,7 +583,7 @@ class Paystack
             $data
         )->getResponse();
     }
-    
+
     /**
      * Disable a subscription using the subscription code and token
      * @return array
@@ -947,7 +945,7 @@ class Paystack
             ];
         }
         return $this
-            ->setHttpResponse(self::TRANSFER_ENDPOINT, "POST", $data)
+            ->setHttpResponse(Endpoints::TRANSFER, "POST", $data)
             ->getResponse();
     }
 }
