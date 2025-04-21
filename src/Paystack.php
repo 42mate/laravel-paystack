@@ -180,7 +180,7 @@ class Paystack
      * @param string $relativeUrl
      * @param string $method
      * @param array $body
-     * @return Paystackxs
+     * @return Paystack
      * @throws IsNullException
      */
     private function setHttpResponse(
