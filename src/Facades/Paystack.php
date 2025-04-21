@@ -54,6 +54,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array confirmAccount(string $account_number, string $bank_code)
  * @method static array createTransferRecipient(?array $data = null)
  * @method static array getTransferRecipients()
+ * @method static array retrieveTransferRecipient(string $recipientCode)
  * @method static array retrieveTransfer()
  * @method static array finalizeTransfer(?array $data = null)
  * @method static array verifyTransfer(string $reference)

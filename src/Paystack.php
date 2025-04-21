@@ -436,7 +436,7 @@ class Paystack
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::CUSTOMER
+            Endpoints::CUSTOMER,
             "POST",
             $data
         )->getResponse();
@@ -528,8 +528,6 @@ class Paystack
     public function getAllSubscriptions()
     {
         $this->setRequestOptions();
-        $this->
-
         return $this->setHttpResponse("/subscription", "GET", [])->getData();
     }
 
@@ -577,7 +575,7 @@ class Paystack
             "code" => request()->code,
             "token" => request()->token,
         ];
-        
+
         $this->setRequestOptions();
         return $this->setHttpResponse(
             Endpoints::SUBSCRIPTION_ENABLE,
@@ -585,7 +583,7 @@ class Paystack
             $data
         )->getResponse();
     }
-    
+
     /**
      * Disable a subscription using the subscription code and token
      * @return array
@@ -853,6 +851,22 @@ class Paystack
     }
 
     /**
+     * Retrieve details of a transfer recipient.
+     *
+     * This method sends a GET request to fetch information about a specific 
+     * transfer recipient using their recipient code.
+     *
+     * @param string $recipientCode The unique code identifying the transfer recipient.
+     *
+     * @return array The response data containing the recipient's details.
+     */
+    public function retrieveTransferRecipient(string $recipientCode): array
+    {
+        $this->setHttpResponse(Endpoints::TRANSFER_RECIPIENT . '/' . $recipientCode, 'GET');
+        return $this->getResponse();
+    }
+
+    /**
      * Retrieve all transfer recipients.
      *
      * @return array The API response containing transfer recipients.
@@ -947,7 +961,7 @@ class Paystack
             ];
         }
         return $this
-            ->setHttpResponse(self::TRANSFER_ENDPOINT, "POST", $data)
+            ->setHttpResponse(Endpoints::TRANSFER, "POST", $data)
             ->getResponse();
     }
 }
