@@ -21,7 +21,7 @@ class Paystack
     /**
      * Transaction Verification Successful
      */
-    const VS = 'Verification successful';
+    const VS = "Verification successful";
 
     /**
      *  Invalid Transaction reference
@@ -68,38 +68,35 @@ class Paystack
     /**
      * Get Base Url from Paystack config file
      */
-    public function setBaseUrl()
+    public function setBaseUrl(): void
     {
-        $this->baseUrl = Config::get('paystack.paymentUrl');
+        $this->baseUrl = Config::get("paystack.paymentUrl");
     }
 
     /**
      * Get secret key from Paystack config file
      */
-    public function setKey()
+    public function setKey(): void
     {
-        $this->secretKey = Config::get('paystack.secretKey');
+        $this->secretKey = Config::get("paystack.secretKey");
     }
 
     /**
      * Set options for making the Client request
      */
-    private function setRequestOptions()
+    private function setRequestOptions(): void
     {
-        $authBearer = 'Bearer ' . $this->secretKey;
+        $authBearer = "Bearer " . $this->secretKey;
 
-        $this->client = new Client(
-            [
-                'base_uri' => $this->baseUrl,
-                'headers' => [
-                    'Authorization' => $authBearer,
-                    'Content-Type'  => 'application/json',
-                    'Accept'        => 'application/json'
-                ]
-            ]
-        );
+        $this->client = new Client([
+            "base_uri" => $this->baseUrl,
+            "headers" => [
+                "Authorization" => $authBearer,
+                "Content-Type" => "application/json",
+                "Accept" => "application/json",
+            ],
+        ]);
     }
-
 
     /**
 
@@ -108,11 +105,9 @@ class Paystack
      * when the payload is built on the fly (not passed to the controller from a view)
      * @return Paystack
      */
-
-    public function makePaymentRequest($data = null)
+    public function makePaymentRequest(?array $data = null): Paystack
     {
         if ($data == null) {
-
             $quantity = intval(request()->quantity ?? 1);
 
             $data = array_filter([
@@ -124,7 +119,8 @@ class Paystack
                 "first_name" => request()->first_name,
                 "last_name" => request()->last_name,
                 "callback_url" => request()->callback_url,
-                "currency" => (request()->currency != ""  ? request()->currency : "NGN"),
+                "currency" =>
+                    request()->currency != "" ? request()->currency : "NGN",
 
                 /*
                     Paystack allows for transactions to be split into a subaccount -
@@ -159,27 +155,26 @@ class Paystack
                  */
                 "split" => request()->split,
                 /*
-                * to allow use of metadata on Paystack dashboard and a means to return additional data back to redirect url
-                * form need an input field: <input type="hidden" name="metadata" value="{{ json_encode($array) }}" >
-                * array must be set up as:
-                * $array = [ 'custom_fields' => [
-                *                   ['display_name' => "Cart Id", "variable_name" => "cart_id", "value" => "2"],
-                *                   ['display_name' => "Sex", "variable_name" => "sex", "value" => "female"],
-                *                   .
-                *                   .
-                *                   .
-                *                  ]
-                *          ]
-                */
-                'metadata' => request()->metadata
+                 * to allow use of metadata on Paystack dashboard and a means to return additional data back to redirect url
+                 * form need an input field: <input type="hidden" name="metadata" value="{{ json_encode($array) }}" >
+                 * array must be set up as:
+                 * $array = [ 'custom_fields' => [
+                 *                   ['display_name' => "Cart Id", "variable_name" => "cart_id", "value" => "2"],
+                 *                   ['display_name' => "Sex", "variable_name" => "sex", "value" => "female"],
+                 *                   .
+                 *                   .
+                 *                   .
+                 *                  ]
+                 *          ]
+                 */
+                "metadata" => request()->metadata,
             ]);
         }
 
-        $this->setHttpResponse('/transaction/initialize', 'POST', $data);
+        $this->setHttpResponse(Endpoints::TRANSACTION_INITIALIZE, "POST", $data);
 
         return $this;
     }
-
 
     /**
      * @param string $relativeUrl
@@ -188,8 +183,11 @@ class Paystack
      * @return Paystack
      * @throws IsNullException
      */
-    private function setHttpResponse($relativeUrl, $method, $body = [])
-    {
+    private function setHttpResponse(
+        $relativeUrl,
+        $method,
+        $body = []
+    ): Paystack {
         if (is_null($method)) {
             throw new IsNullException("Empty method not allowed");
         }
@@ -210,7 +208,7 @@ class Paystack
     {
         $this->makePaymentRequest($data);
 
-        $this->url = $this->getResponse()['data']['authorization_url'];
+        $this->url = $this->getResponse()["data"]["authorization_url"];
 
         return $this;
     }
@@ -225,7 +223,7 @@ class Paystack
     {
         $this->makePaymentRequest($data);
 
-        $this->url = $this->getResponse()['data']['authorization_url'];
+        $this->url = $this->getResponse()["data"]["authorization_url"];
 
         return $this->getResponse();
     }
@@ -235,9 +233,9 @@ class Paystack
      */
     private function verifyTransactionAtGateway($transaction_id = null)
     {
-        $transactionRef = $transaction_id ?? request()->query('trxref');
-
-        $relativeUrl = "/transaction/verify/{$transactionRef}";
+        $transactionRef = $transaction_id ?? request()->query("trxref");
+        $endpoint = Endpoints::TRANSACTION_VERIFY;
+        $relativeUrl = "{$endpoint}/{$transactionRef}";
 
         $this->response = $this->client->get($this->baseUrl . $relativeUrl, []);
     }
@@ -250,7 +248,7 @@ class Paystack
     {
         $this->verifyTransactionAtGateway($transaction_id);
 
-        $result = $this->getResponse()['message'];
+        $result = $this->getResponse()["message"];
 
         switch ($result) {
             case self::VS:
@@ -277,7 +275,9 @@ class Paystack
         if ($this->isTransactionVerificationValid()) {
             return $this->getResponse();
         } else {
-            throw new PaymentVerificationFailedException("Invalid Transaction Reference");
+            throw new PaymentVerificationFailedException(
+                "Invalid Transaction Reference"
+            );
         }
     }
 
@@ -295,7 +295,7 @@ class Paystack
      */
     public function getAccessCode()
     {
-        return $this->getResponse()['data']['access_code'];
+        return $this->getResponse()["data"]["access_code"];
     }
 
     /**
@@ -315,7 +315,7 @@ class Paystack
     {
         $this->setRequestOptions();
 
-        return $this->setHttpResponse("/customer", 'GET', [])->getData();
+        return $this->setHttpResponse(Endpoints::CUSTOMER, "GET", [])->getData();
     }
 
     /**
@@ -326,7 +326,7 @@ class Paystack
     {
         $this->setRequestOptions();
 
-        return $this->setHttpResponse("/plan", 'GET', [])->getData();
+        return $this->setHttpResponse(Endpoints::PLAN, "GET", [])->getData();
     }
 
     /**
@@ -337,14 +337,14 @@ class Paystack
     {
         $this->setRequestOptions();
 
-        return $this->setHttpResponse("/transaction", 'GET', [])->getData();
+        return $this->setHttpResponse(Endpoints::TRANSACTION, "GET", [])->getData();
     }
 
     /**
      * Get the whole response from a get operation
      * @return array
      */
-    private function getResponse()
+    public function getResponse()
     {
         return json_decode($this->response->getBody(), true);
     }
@@ -353,9 +353,9 @@ class Paystack
      * Get the data response from a get operation
      * @return array
      */
-    private function getData()
+    public function getData()
     {
-        return $this->getResponse()['data'];
+        return $this->getResponse()["data"];
     }
 
     /**
@@ -375,7 +375,7 @@ class Paystack
 
         $this->setRequestOptions();
 
-        return $this->setHttpResponse("/plan", 'POST', $data)->getResponse();
+        return $this->setHttpResponse(Endpoints::PLAN, "POST", $data)->getResponse();
     }
 
     /**
@@ -386,7 +386,11 @@ class Paystack
     public function fetchPlan($plan_code)
     {
         $this->setRequestOptions();
-        return $this->setHttpResponse('/plan/' . $plan_code, 'GET', [])->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::PLAN . "/" . $plan_code,
+            "GET",
+            []
+        )->getResponse();
     }
 
     /**
@@ -407,7 +411,11 @@ class Paystack
         ];
 
         $this->setRequestOptions();
-        return $this->setHttpResponse('/plan/' . $plan_code, 'PUT', $data)->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::PLAN . "/" . $plan_code,
+            "PUT",
+            $data
+        )->getResponse();
     }
 
     /**
@@ -416,19 +424,22 @@ class Paystack
     public function createCustomer($data = null)
     {
         if ($data == null) {
-
             $data = [
                 "email" => request()->email,
                 "first_name" => request()->fname,
                 "last_name" => request()->lname,
                 "phone" => request()->phone,
-                "metadata" => request()->additional_info /* key => value pairs array */
-
+                "metadata" => request()
+                    ->additional_info /* key => value pairs array */,
             ];
         }
-        
+
         $this->setRequestOptions();
-        return $this->setHttpResponse('/customer', 'POST', $data)->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::CUSTOMER
+            "POST",
+            $data
+        )->getResponse();
     }
 
     /**
@@ -439,7 +450,11 @@ class Paystack
     public function fetchCustomer($customer_id)
     {
         $this->setRequestOptions();
-        return $this->setHttpResponse('/customer/' . $customer_id, 'GET', [])->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::CUSTOMER . "/" . $customer_id,
+            "GET",
+            []
+        )->getResponse();
     }
 
     /**
@@ -454,12 +469,16 @@ class Paystack
             "first_name" => request()->fname,
             "last_name" => request()->lname,
             "phone" => request()->phone,
-            "metadata" => request()->additional_info /* key => value pairs array */
-
+            "metadata" => request()
+                ->additional_info /* key => value pairs array */,
         ];
 
         $this->setRequestOptions();
-        return $this->setHttpResponse('/customer/' . $customer_id, 'PUT', $data)->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::CUSTOMER . "/" . $customer_id,
+            "PUT",
+            $data
+        )->getResponse();
     }
 
     /**
@@ -471,11 +490,15 @@ class Paystack
         $data = [
             "from" => request()->from,
             "to" => request()->to,
-            'settled' => request()->settled
+            "settled" => request()->settled,
         ];
 
         $this->setRequestOptions();
-        return $this->setHttpResponse('/transaction/export', 'GET', $data)->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::TRANSACTION_EXPORT,
+            "GET",
+            $data
+        )->getResponse();
     }
 
     /**
@@ -486,11 +509,15 @@ class Paystack
         $data = [
             "customer" => request()->customer, //Customer email or code
             "plan" => request()->plan,
-            "authorization" => request()->authorization_code
+            "authorization" => request()->authorization_code,
         ];
 
         $this->setRequestOptions();
-        return $this->setHttpResponse('/subscription', 'POST', $data)->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::SUBSCRIPTION,
+            "POST",
+            $data
+        )->getResponse();
     }
 
     /**
@@ -501,8 +528,9 @@ class Paystack
     public function getAllSubscriptions()
     {
         $this->setRequestOptions();
+        $this->
 
-        return $this->setHttpResponse("/subscription", 'GET', [])->getData();
+        return $this->setHttpResponse("/subscription", "GET", [])->getData();
     }
 
     /**
@@ -515,7 +543,11 @@ class Paystack
     {
         $this->setRequestOptions();
 
-        return $this->setHttpResponse('/subscription?customer=' . $customer_id, 'GET', [])->getData();
+        return $this->setHttpResponse(
+            Endpoints::SUBSCRIPTION . "?customer=" . $customer_id,
+            "GET",
+            []
+        )->getData();
     }
 
     /**
@@ -528,7 +560,11 @@ class Paystack
     {
         $this->setRequestOptions();
 
-        return $this->setHttpResponse('/subscription?plan=' . $plan_id, 'GET', [])->getData();
+        return $this->setHttpResponse(
+            Endpoints::SUBSCRIPTION . "?plan=" . $plan_id,
+            "GET",
+            []
+        )->getData();
     }
 
     /**
@@ -541,11 +577,15 @@ class Paystack
             "code" => request()->code,
             "token" => request()->token,
         ];
-
+        
         $this->setRequestOptions();
-        return $this->setHttpResponse('/subscription/enable', 'POST', $data)->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::SUBSCRIPTION_ENABLE,
+            "POST",
+            $data
+        )->getResponse();
     }
-
+    
     /**
      * Disable a subscription using the subscription code and token
      * @return array
@@ -558,7 +598,11 @@ class Paystack
         ];
 
         $this->setRequestOptions();
-        return $this->setHttpResponse('/subscription/disable', 'POST', $data)->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::SUBSCRIPTION_DISABLE,
+            "POST",
+            $data
+        )->getResponse();
     }
 
     /**
@@ -569,7 +613,11 @@ class Paystack
     public function fetchSubscription($subscription_id)
     {
         $this->setRequestOptions();
-        return $this->setHttpResponse('/subscription/' . $subscription_id, 'GET', [])->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::SUBSCRIPTION . "/" . $subscription_id,
+            "GET",
+            []
+        )->getResponse();
     }
 
     /**
@@ -580,11 +628,11 @@ class Paystack
         $data = [
             "name" => request()->name,
             "description" => request()->description,
-            "amount" => request()->amount
+            "amount" => request()->amount,
         ];
 
         $this->setRequestOptions();
-        return $this->setHttpResponse('/page', 'POST', $data)->getResponse();
+        return $this->setHttpResponse(Endpoints::PAGE, "POST", $data)->getResponse();
     }
 
     /**
@@ -594,7 +642,7 @@ class Paystack
     public function getAllPages()
     {
         $this->setRequestOptions();
-        return $this->setHttpResponse('/page', 'GET', [])->getResponse();
+        return $this->setHttpResponse(Endpoints::PAGE, "GET", [])->getResponse();
     }
 
     /**
@@ -605,7 +653,11 @@ class Paystack
     public function fetchPage($page_id)
     {
         $this->setRequestOptions();
-        return $this->setHttpResponse('/page/' . $page_id, 'GET', [])->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::PAGE . '/' . $page_id,
+            "GET",
+            []
+        )->getResponse();
     }
 
     /**
@@ -618,11 +670,15 @@ class Paystack
         $data = [
             "name" => request()->name,
             "description" => request()->description,
-            "amount" => request()->amount
+            "amount" => request()->amount,
         ];
 
         $this->setRequestOptions();
-        return $this->setHttpResponse('/page/' . $page_id, 'PUT', $data)->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::PAGE . '/' . $page_id,
+            "PUT",
+            $data
+        )->getResponse();
     }
 
     /**
@@ -642,11 +698,15 @@ class Paystack
             "primary_contact_name" => request()->primary_contact_name,
             "primary_contact_phone" => request()->primary_contact_phone,
             "metadata" => request()->metadata,
-            'settlement_schedule' => request()->settlement_schedule
+            "settlement_schedule" => request()->settlement_schedule,
         ];
 
         $this->setRequestOptions();
-        return $this->setHttpResponse('/subaccount', 'POST', array_filter($data))->getResponse();
+        return $this->setHttpResponse(
+            "/subaccount",
+            "POST",
+            array_filter($data)
+        )->getResponse();
     }
 
     /**
@@ -656,9 +716,12 @@ class Paystack
      */
     public function fetchSubAccount($subaccount_code)
     {
-
         $this->setRequestOptions();
-        return $this->setHttpResponse("/subaccount/{$subaccount_code}", "GET", [])->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::SUBACCOUNT . '/' . $subaccount_code,
+            "GET",
+            []
+        )->getResponse();
     }
 
     /**
@@ -668,19 +731,19 @@ class Paystack
      */
     public function listSubAccounts($per_page, $page)
     {
-
         $this->setRequestOptions();
-        return $this->setHttpResponse("/subaccount/?perPage=" . (int) $per_page . "&page=" . (int) $page, "GET")->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::SUBACCOUNT . '/?perPage=' . (int) $per_page . "&page=" . (int) $page,
+            "GET"
+        )->getResponse();
     }
-
 
     /**
      * Updates a subaccount to be used for split payments . Required params are business_name , settlement_bank , account_number , percentage_charge
      * @param subaccount code
      * @return array
      */
-
-    public function updateSubAccount($subaccount_code)
+    public function updateSubAccount(array $subaccount_code)
     {
         $data = [
             "business_name" => request()->business_name,
@@ -692,27 +755,42 @@ class Paystack
             "primary_contact_name" => request()->primary_contact_name,
             "primary_contact_phone" => request()->primary_contact_phone,
             "metadata" => request()->metadata,
-            'settlement_schedule' => request()->settlement_schedule
+            "settlement_schedule" => request()->settlement_schedule,
         ];
 
         $this->setRequestOptions();
-        return $this->setHttpResponse("/subaccount/{$subaccount_code}", "PUT", array_filter($data))->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::SUBACCOUNT ."/{$subaccount_code}",
+            "PUT",
+            array_filter($data)
+        )->getResponse();
     }
 
-    
     /**
      * Get a list of all supported banks and their properties
-     * @param $country - The country from which to obtain the list of supported banks, $per_page - Specifies how many records to retrieve per page , 
+     * @param $country - The country from which to obtain the list of supported banks, $per_page - Specifies how many records to retrieve per page ,
      * $use_cursor - Flag to enable cursor pagination on the endpoint
      * @return array
      */
-    public function getBanks(?string $country, int $per_page = 50, bool $use_cursor = false)
-    {
-        if (!$country)
-            $country = request()->country ?? 'nigeria';
+    public function getBanks(
+        ?string $country,
+        int $per_page = 50,
+        bool $use_cursor = false
+    ) {
+        if (!$country) {
+            $country = request()->country ?? "nigeria";
+        }
 
         $this->setRequestOptions();
-        return $this->setHttpResponse("/bank/?country=" . $country . "&use_cursor=" . $use_cursor . "&perPage=" . (int) $per_page, "GET")->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::BANK . "/?country=" .
+                $country .
+                "&use_cursor=" .
+                $use_cursor .
+                "&perPage=" .
+                (int) $per_page,
+            "GET"
+        )->getResponse();
     }
 
     /**
@@ -722,8 +800,154 @@ class Paystack
      */
     public function confirmAccount(string $account_number, string $bank_code)
     {
-
         $this->setRequestOptions();
-        return $this->setHttpResponse("/bank/resolve/?account_number=" . $account_number . "&bank_code=" . $bank_code, "GET")->getResponse();
+        return $this->setHttpResponse(
+            Endpoints::BANK . "/resolve/?account_number=" .
+                $account_number .
+                "&bank_code=" .
+                $bank_code,
+            "GET"
+        )->getResponse();
+    }
+
+    /**
+     * Create a transfer recipient.
+     *
+     * If no data is provided, it uses the current request to populate the fields.
+     *
+     * Required fields:
+     * - type
+     * - name
+     * - account_number
+     * - bank_code
+     *
+     * Optional fields:
+     * - description
+     * - currency
+     * - authorization_code
+     * - metadata
+     *
+     * @param array|null $data Optional data to create the transfer recipient.
+     * @return array The API response.
+     */
+    public function createTransferRecipient(?array $data = null): array
+    {
+        if ($data === null) {
+            $data = [
+                "type" => request()->type,
+                "name" => request()->name,
+                "account_number" => request()->account_number,
+                "bank_code" => request()->bank_code,
+            ];
+
+            foreach (["description", "currency", "authorization_code", "metadata"] as $optional) {
+                if (request()->has($optional)) {
+                    $data[$optional] = request()->$optional;
+                }
+            }
+        }
+
+        return $this
+            ->setHttpResponse(Endpoints::TRANSFER_RECIPIENT, "POST", $data)
+            ->getResponse();
+    }
+
+    /**
+     * Retrieve all transfer recipients.
+     *
+     * @return array The API response containing transfer recipients.
+     */
+    public function getTransferRecipients(): array
+    {
+        $this->setHttpResponse(Endpoints::TRANSFER_RECIPIENT, 'GET');
+        return $this->getResponse();
+    }
+
+    /**
+     * Retrieve details of a transfer.
+     *
+     * @return array The API response containing transfer details.
+     */
+    public function retrieveTransfer(): array
+    {
+        return $this
+            ->setHttpResponse(Endpoints::TRANSFER, 'GET')
+            ->getResponse();
+    }
+
+    /**
+     * Finalize a transfer that requires OTP validation.
+     *
+     * If no data is provided, it uses the current request to populate the fields.
+     *
+     * Required fields:
+     * - transfer_code
+     * - otp
+     *
+     * @param array|null $data Optional data to finalize the transfer.
+     * @return array The API response.
+     */
+    public function finalizeTransfer(?array $data = null): array
+    {
+        if (is_null($data)) {
+            $data = [
+                'transfer_code' => request()->transfer_code,
+                'otp' => request()->otp,
+            ];
+        }
+
+        return $this
+            ->setHttpResponse(Endpoints::TRANSFER . '/finalize_transfer', 'POST', $data)
+            ->getResponse();
+    }
+
+    /**
+     * Verify the status of a transfer by its reference.
+     *
+     * @param string $reference The transfer reference to verify.
+     * @return array The API response.
+     */
+    public function verifyTransfer(string $reference): array
+    {
+        return $this
+            ->setHttpResponse(Endpoints::TRANSFER_FINALIZE . '/' . $reference, 'GET')
+            ->getResponse();
+    }
+
+    /**
+     * Initiate a new transfer.
+     *
+     * If no data is provided, it uses the current request to populate the fields.
+     *
+     * Required fields:
+     * - source (e.g., "balance")
+     * - reason
+     * - amount
+     * - recipient
+     *
+     * Example payload:
+     * {
+     *   "source": "balance",
+     *   "reason": "Calm down",
+     *   "amount": 3794800,
+     *   "recipient": "RCP_gx2wn530m0i3w3m"
+     * }
+     *
+     * @param array|null $data Optional data to initiate the transfer.
+     * @return array The API response.
+     */
+    public function makeTransfer(?array $data = null): array
+    {
+        if ($data === null) {
+            $data = [
+                "source" => request()->source,
+                "reason" => request()->reason,
+                "amount" => request()->amount,
+                "recipient" => request()->recipient,
+            ];
+        }
+        return $this
+            ->setHttpResponse(self::TRANSFER_ENDPOINT, "POST", $data)
+            ->getResponse();
     }
 }
