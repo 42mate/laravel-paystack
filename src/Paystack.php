@@ -244,9 +244,9 @@ class Paystack
      * True or false condition whether the transaction is verified
      * @return boolean
      */
-    public function isTransactionVerificationValid($transaction_id = null)
+    public function isTransactionVerificationValid($transactionId = null)
     {
-        $this->verifyTransactionAtGateway($transaction_id);
+        $this->verifyTransactionAtGateway($transactionId);
 
         $result = $this->getResponse()["message"];
 
@@ -361,17 +361,19 @@ class Paystack
     /**
      * Create a plan
      */
-    public function createPlan()
+    public function createPlan(?array $data = null): array
     {
-        $data = [
-            "name" => request()->name,
-            "description" => request()->desc,
-            "amount" => intval(request()->amount),
-            "interval" => request()->interval,
-            "send_invoices" => request()->send_invoices,
-            "send_sms" => request()->send_sms,
-            "currency" => request()->currency,
-        ];
+        if (is_null($data)) {
+            $data = [
+                "name" => request()->name,
+                "description" => request()->desc,
+                "amount" => intval(request()->amount),
+                "interval" => request()->interval,
+                "send_invoices" => request()->send_invoices,
+                "send_sms" => request()->send_sms,
+                "currency" => request()->currency,
+            ];
+        }
 
         $this->setRequestOptions();
 
@@ -383,11 +385,11 @@ class Paystack
      * @param $plan_code
      * @return array
      */
-    public function fetchPlan($plan_code)
+    public function fetchPlan($planCode)
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::PLAN . "/" . $plan_code,
+            Endpoints::PLAN . "/" . $planCode,
             "GET",
             []
         )->getResponse();
@@ -398,21 +400,24 @@ class Paystack
      * @param $plan_code
      * @return array
      */
-    public function updatePlan($plan_code)
+    public function updatePlan(string $planCode, ?array $data = null)
     {
-        $data = [
-            "name" => request()->name,
-            "description" => request()->desc,
-            "amount" => intval(request()->amount),
-            "interval" => request()->interval,
-            "send_invoices" => request()->send_invoices,
-            "send_sms" => request()->send_sms,
-            "currency" => request()->currency,
-        ];
+
+        if (is_null($data)) {
+            $data = [
+                "name" => request()->name,
+                "description" => request()->desc,
+                "amount" => intval(request()->amount),
+                "interval" => request()->interval,
+                "send_invoices" => request()->send_invoices,
+                "send_sms" => request()->send_sms,
+                "currency" => request()->currency,
+            ];
+        }
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::PLAN . "/" . $plan_code,
+            Endpoints::PLAN . "/" . $planCode,
             "PUT",
             $data
         )->getResponse();
@@ -447,11 +452,11 @@ class Paystack
      * @param $customer_id
      * @return array
      */
-    public function fetchCustomer($customer_id)
+    public function fetchCustomer($customerId)
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::CUSTOMER . "/" . $customer_id,
+            Endpoints::CUSTOMER . "/" . $customerId,
             "GET",
             []
         )->getResponse();
@@ -462,20 +467,21 @@ class Paystack
      * @param $customer_id
      * @return array
      */
-    public function updateCustomer($customer_id)
+    public function updateCustomer(string $customerId, ?array $data = null): array
     {
-        $data = [
-            "email" => request()->email,
-            "first_name" => request()->fname,
-            "last_name" => request()->lname,
-            "phone" => request()->phone,
-            "metadata" => request()
-                ->additional_info /* key => value pairs array */,
-        ];
-
+        if (is_null($data)) {
+            $data = [
+                "email" => request()->email,
+                "first_name" => request()->fname,
+                "last_name" => request()->lname,
+                "phone" => request()->phone,
+                "metadata" => request()
+                    ->additional_info /* key => value pairs array */,
+            ];
+        }
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::CUSTOMER . "/" . $customer_id,
+            Endpoints::CUSTOMER . "/" . $customerId,
             "PUT",
             $data
         )->getResponse();
@@ -504,13 +510,15 @@ class Paystack
     /**
      * Create a subscription to a plan from a customer.
      */
-    public function createSubscription()
+    public function createSubscription(?array $data = null): array
     {
-        $data = [
-            "customer" => request()->customer, //Customer email or code
-            "plan" => request()->plan,
-            "authorization" => request()->authorization_code,
-        ];
+        if (is_null($data)) {
+            $data = [
+                "customer" => request()->customer, //Customer email or code
+                "plan" => request()->plan,
+                "authorization" => request()->authorization_code,
+            ];
+        }
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
@@ -537,12 +545,12 @@ class Paystack
      * @param integer $customer_id
      * @return array
      */
-    public function getCustomerSubscriptions($customer_id)
+    public function getCustomerSubscriptions($customerId)
     {
         $this->setRequestOptions();
 
         return $this->setHttpResponse(
-            Endpoints::SUBSCRIPTION . "?customer=" . $customer_id,
+            Endpoints::SUBSCRIPTION . "?customer=" . $customerId,
             "GET",
             []
         )->getData();
@@ -554,12 +562,12 @@ class Paystack
      * @param  integer $plan_id
      * @return array
      */
-    public function getPlanSubscriptions($plan_id)
+    public function getPlanSubscriptions($planId)
     {
         $this->setRequestOptions();
 
         return $this->setHttpResponse(
-            Endpoints::SUBSCRIPTION . "?plan=" . $plan_id,
+            Endpoints::SUBSCRIPTION . "?plan=" . $planId,
             "GET",
             []
         )->getData();
@@ -569,12 +577,14 @@ class Paystack
      * Enable a subscription using the subscription code and token
      * @return array
      */
-    public function enableSubscription()
+    public function enableSubscription(?array $data = null): array
     {
-        $data = [
-            "code" => request()->code,
-            "token" => request()->token,
-        ];
+        if (is_null($data)) {
+            $data = [
+                "code" => request()->code,
+                "token" => request()->token,
+            ];
+        }
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
@@ -588,12 +598,14 @@ class Paystack
      * Disable a subscription using the subscription code and token
      * @return array
      */
-    public function disableSubscription()
+    public function disableSubscription(?array $data = null): array
     {
-        $data = [
-            "code" => request()->code,
-            "token" => request()->token,
-        ];
+        if (is_null($data)) {
+            $data = [
+                "code" => request()->code,
+                "token" => request()->token,
+            ];
+        }
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
@@ -605,14 +617,14 @@ class Paystack
 
     /**
      * Fetch details about a certain subscription
-     * @param mixed $subscription_id
+     * @param mixed $subscriptionId
      * @return array
      */
-    public function fetchSubscription($subscription_id)
+    public function fetchSubscription($subscriptionId)
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::SUBSCRIPTION . "/" . $subscription_id,
+            Endpoints::SUBSCRIPTION . "/" . $subscriptionId,
             "GET",
             []
         )->getResponse();
@@ -621,13 +633,15 @@ class Paystack
     /**
      * Create pages you can share with users using the returned slug
      */
-    public function createPage()
+    public function createPage(?array $data = null): array
     {
-        $data = [
-            "name" => request()->name,
-            "description" => request()->description,
-            "amount" => request()->amount,
-        ];
+        if (is_null($data)) {
+            $data = [
+                "name" => request()->name,
+                "description" => request()->description,
+                "amount" => request()->amount,
+            ];
+        }
 
         $this->setRequestOptions();
         return $this->setHttpResponse(Endpoints::PAGE, "POST", $data)->getResponse();
@@ -648,11 +662,11 @@ class Paystack
      * @param mixed $page_id
      * @return array
      */
-    public function fetchPage($page_id)
+    public function fetchPage($pageId)
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::PAGE . '/' . $page_id,
+            Endpoints::PAGE . '/' . $pageId,
             "GET",
             []
         )->getResponse();
@@ -663,17 +677,19 @@ class Paystack
      * @param $page_id
      * @return array
      */
-    public function updatePage($page_id)
+    public function updatePage(mixed $pageId, ?array $data = null): array
     {
-        $data = [
-            "name" => request()->name,
-            "description" => request()->description,
-            "amount" => request()->amount,
-        ];
+        if (is_null($array)) {
+            $data = [
+                "name" => request()->name,
+                "description" => request()->description,
+                "amount" => request()->amount,
+            ];
+        }
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::PAGE . '/' . $page_id,
+            Endpoints::PAGE . '/' . $pageId,
             "PUT",
             $data
         )->getResponse();
@@ -684,20 +700,21 @@ class Paystack
      *
      * @return array
      */
-
-    public function createSubAccount()
+    public function createSubAccount(?array $data = null): array
     {
-        $data = [
-            "business_name" => request()->business_name,
-            "settlement_bank" => request()->settlement_bank,
-            "account_number" => request()->account_number,
-            "percentage_charge" => request()->percentage_charge,
-            "primary_contact_email" => request()->primary_contact_email,
-            "primary_contact_name" => request()->primary_contact_name,
-            "primary_contact_phone" => request()->primary_contact_phone,
-            "metadata" => request()->metadata,
-            "settlement_schedule" => request()->settlement_schedule,
-        ];
+        if (is_null($data)) {
+            $data = [
+                "business_name" => request()->business_name,
+                "settlement_bank" => request()->settlement_bank,
+                "account_number" => request()->account_number,
+                "percentage_charge" => request()->percentage_charge,
+                "primary_contact_email" => request()->primary_contact_email,
+                "primary_contact_name" => request()->primary_contact_name,
+                "primary_contact_phone" => request()->primary_contact_phone,
+                "metadata" => request()->metadata,
+                "settlement_schedule" => request()->settlement_schedule,
+            ];
+        }
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
@@ -712,11 +729,11 @@ class Paystack
      * @param subaccount code
      * @return array
      */
-    public function fetchSubAccount($subaccount_code)
+    public function fetchSubAccount($subaccountCode): array
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::SUBACCOUNT . '/' . $subaccount_code,
+            Endpoints::SUBACCOUNT . '/' . $subaccountCode,
             "GET",
             []
         )->getResponse();
@@ -727,11 +744,11 @@ class Paystack
      * @param $per_page - Specifies how many records to retrieve per page , $page - SPecifies exactly what page to retrieve
      * @return array
      */
-    public function listSubAccounts($per_page, $page)
+    public function listSubAccounts($perPage, $page): array
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::SUBACCOUNT . '/?perPage=' . (int) $per_page . "&page=" . (int) $page,
+            Endpoints::SUBACCOUNT . '/?perPage=' . (int) $perPage . "&page=" . (int) $page,
             "GET"
         )->getResponse();
     }
@@ -741,24 +758,26 @@ class Paystack
      * @param subaccount code
      * @return array
      */
-    public function updateSubAccount(array $subaccount_code)
+    public function updateSubAccount(array $subaccountCode, ?array $data = null): array
     {
-        $data = [
-            "business_name" => request()->business_name,
-            "settlement_bank" => request()->settlement_bank,
-            "account_number" => request()->account_number,
-            "percentage_charge" => request()->percentage_charge,
-            "description" => request()->description,
-            "primary_contact_email" => request()->primary_contact_email,
-            "primary_contact_name" => request()->primary_contact_name,
-            "primary_contact_phone" => request()->primary_contact_phone,
-            "metadata" => request()->metadata,
-            "settlement_schedule" => request()->settlement_schedule,
-        ];
+        if (is_null($data)) {
+            $data = [
+                "business_name" => request()->business_name,
+                "settlement_bank" => request()->settlement_bank,
+                "account_number" => request()->account_number,
+                "percentage_charge" => request()->percentage_charge,
+                "description" => request()->description,
+                "primary_contact_email" => request()->primary_contact_email,
+                "primary_contact_name" => request()->primary_contact_name,
+                "primary_contact_phone" => request()->primary_contact_phone,
+                "metadata" => request()->metadata,
+                "settlement_schedule" => request()->settlement_schedule,
+            ];
+        }
 
         $this->setRequestOptions();
         return $this->setHttpResponse(
-            Endpoints::SUBACCOUNT ."/{$subaccount_code}",
+            Endpoints::SUBACCOUNT ."/{$subaccountCode}",
             "PUT",
             array_filter($data)
         )->getResponse();
@@ -796,14 +815,14 @@ class Paystack
      * @param $account_number - Account Number, $bank_code - You can get the list of bank codes by calling the List Banks endpoint
      * @return array
      */
-    public function confirmAccount(string $account_number, string $bank_code)
+    public function confirmAccount(string $accountNumber, string $bankCode)
     {
         $this->setRequestOptions();
         return $this->setHttpResponse(
             Endpoints::BANK . "/resolve/?account_number=" .
-                $account_number .
+                $accountNumber .
                 "&bank_code=" .
-                $bank_code,
+                $bankCode,
             "GET"
         )->getResponse();
     }
